@@ -14,6 +14,7 @@ public class User {
     private Long user_id;
 
     private String username;
+    private String email;
     private String password;
     private String cpf;
     private double saldo;
@@ -21,9 +22,10 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Transactions> transactions = new ArrayList<>();
 
-    public User(Long user_id, String username, String password, String cpf) {
+    public User(Long user_id, String username, String email, String password, String cpf) {
         this.user_id = user_id;
         this.username = username;
+        this.email = email;
         this.password = password;
         this.cpf = cpf;
         this.saldo = 0;
@@ -47,6 +49,14 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
