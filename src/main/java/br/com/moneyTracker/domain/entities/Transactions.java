@@ -23,6 +23,10 @@ public class Transactions {
     private TRANSACTION_CATEGORY transactionCategory;
     private LocalDate date;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user; // O nome do campo deve ser "user" para corresponder ao mappedBy
+
     public Transactions(String name, double value, TRANSACTION_TYPE transactionType, TRANSACTION_CATEGORY transactionCategory) {
         this.name = name;
         this.value = value;
@@ -34,4 +38,6 @@ public class Transactions {
     public Transactions() {
 
     }
+
+
 }

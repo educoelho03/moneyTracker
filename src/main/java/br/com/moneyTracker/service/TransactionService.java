@@ -3,7 +3,7 @@ package br.com.moneyTracker.service;
 import br.com.moneyTracker.domain.entities.Transactions;
 import br.com.moneyTracker.domain.entities.User;
 import br.com.moneyTracker.domain.enums.TRANSACTION_TYPE;
-import br.com.moneyTracker.dto.response.TransactionResponse;
+import br.com.moneyTracker.dto.response.TransactionResponseDTO;
 import br.com.moneyTracker.exceptions.UserNotFoundException;
 import br.com.moneyTracker.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -41,10 +41,10 @@ public class TransactionService {
 
     }
 
-    public List<TransactionResponse> listTransactionsByUserId(Long userId) {
+    public List<TransactionResponseDTO> listTransactionsByUserId(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found."));
         return user.getTransactions().stream()
-                .map(transactions -> new TransactionResponse(
+                .map(transactions -> new TransactionResponseDTO(
                         transactions.getName(),
                         transactions.getValue(),
                         transactions.getTransactionType(),

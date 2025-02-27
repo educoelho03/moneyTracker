@@ -13,7 +13,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long user_id;
 
-    private String username;
+    private String name;
     private String email;
     private String password;
     private String cpf;
@@ -22,9 +22,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Transactions> transactions = new ArrayList<>();
 
-    public User(Long user_id, String username, String email, String password, String cpf) {
+    public User(Long user_id, String name, String email, String password, String cpf) {
         this.user_id = user_id;
-        this.username = username;
+        this.name = name;
         this.email = email;
         this.password = password;
         this.cpf = cpf;
@@ -43,12 +43,12 @@ public class User {
         this.user_id = user_id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getName() {
+        return name;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getEmail() {

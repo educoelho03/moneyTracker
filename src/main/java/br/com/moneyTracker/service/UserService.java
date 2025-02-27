@@ -1,8 +1,8 @@
 package br.com.moneyTracker.service;
 
 import br.com.moneyTracker.domain.entities.User;
-import br.com.moneyTracker.dto.request.UserRequest;
-import br.com.moneyTracker.dto.response.UserResponse;
+import br.com.moneyTracker.dto.request.UserRequestDTO;
+import br.com.moneyTracker.dto.response.UserResponseDTO;
 import br.com.moneyTracker.exceptions.CpfAlreadyExistException;
 import br.com.moneyTracker.exceptions.EmailAlreadyExistException;
 import br.com.moneyTracker.exceptions.InvalidEmailException;
@@ -26,7 +26,7 @@ public class UserService {
         return email.matches(regex);
     }
 
-    public UserResponse createUser(UserRequest request){
+    public UserResponseDTO createUser(UserRequestDTO request){
         if(userRepository.findByCpf(request.cpf()).isPresent()){
             throw new CpfAlreadyExistException("CPF já cadastrado.");
         }
@@ -40,7 +40,7 @@ public class UserService {
         }
 
         User user = new User();
-        user.setUsername(request.username());
+        user.setName(request.username());
         user.setEmail(request.email());
         user.setPassword(passwordEncoder.encode(request.password())); // criptografar senha
         user.setCpf(request.cpf());
@@ -48,9 +48,9 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
 
-        return new UserResponse(
+        return new UserResponseDTO(
                 savedUser.getuser_id(),
-                savedUser.getUsername(),
+                savedUser.getName(),
                 savedUser.getEmail(),
                 savedUser.getCpf()
         );

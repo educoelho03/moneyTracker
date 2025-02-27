@@ -1,6 +1,6 @@
 package br.com.moneyTracker.controller;
 
-import br.com.moneyTracker.dto.response.TransactionResponse;
+import br.com.moneyTracker.dto.response.TransactionResponseDTO;
 import br.com.moneyTracker.service.TransactionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +20,7 @@ public class TransactionController {
     }
 
     @GetMapping("/transactions")
-    public ResponseEntity<List<TransactionResponse>> getAllTransactions(Long userId) {
+    public ResponseEntity<List<TransactionResponseDTO>> getAllTransactions(Long userId) {
         return ResponseEntity.status(200).body(transactionService.listTransactionsByUserId(userId));
     }
 }

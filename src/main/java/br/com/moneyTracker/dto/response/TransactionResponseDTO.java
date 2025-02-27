@@ -5,7 +5,7 @@ import br.com.moneyTracker.domain.enums.TRANSACTION_TYPE;
 
 import java.time.LocalDate;
 
-public record TransactionResponse(
+public record TransactionResponseDTO(
         String name,
         double value,
         TRANSACTION_TYPE transactionType,
