@@ -24,15 +24,15 @@ public class TransactionService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found."));
 
-        Transactions transactions = new Transactions(transact.getName(), transact.getValue(), transact.getTransactionType(), transact.getTransactionCategory());
+        Transactions transactions = new Transactions(transact.getName(), transact.getAmount(), transact.getTransactionType(), transact.getTransactionCategory());
         
         if(transact.getTransactionType() == TRANSACTION_TYPE.DESPESA){
-            user.setSaldo(user.getSaldo() - transact.getValue());
+            user.setSaldo(user.getSaldo() - transact.getAmount());
         } else if (transact.getTransactionType() == TRANSACTION_TYPE.DEPOSITO){
-            user.setSaldo(user.getSaldo() + transact.getValue());
+            user.setSaldo(user.getSaldo() + transact.getAmount());
         }
 
-        if (transact.getTransactionType() == TRANSACTION_TYPE.DESPESA && user.getSaldo() - transact.getValue() < 0) {
+        if (transact.getTransactionType() == TRANSACTION_TYPE.DESPESA && user.getSaldo() - transact.getAmount() < 0) {
             throw new RuntimeException("Saldo insuficiente para realizar a transação");
         }
 
@@ -46,7 +46,7 @@ public class TransactionService {
         return user.getTransactions().stream()
                 .map(transactions -> new TransactionResponseDTO(
                         transactions.getName(),
-                        transactions.getValue(),
+                        transactions.getAmount(),
                         transactions.getTransactionType(),
                         transactions.getTransactionCategory(),
                         transactions.getDate()

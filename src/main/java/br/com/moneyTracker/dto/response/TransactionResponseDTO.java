@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 public record TransactionResponseDTO(
         String name,
-        double value,
+        double amount,
         TRANSACTION_TYPE transactionType,
         TRANSACTION_CATEGORY transactionCategory,
         LocalDate date

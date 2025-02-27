@@ -18,7 +18,7 @@ public class Transactions {
     private Long trasaction_id;
 
     private String name;
-    private double value;
+    private double amount;
     private TRANSACTION_TYPE transactionType;
     private TRANSACTION_CATEGORY transactionCategory;
     private LocalDate date;
@@ -27,9 +27,9 @@ public class Transactions {
     @JoinColumn(name = "user_id")
     private User user; // O nome do campo deve ser "user" para corresponder ao mappedBy
 
-    public Transactions(String name, double value, TRANSACTION_TYPE transactionType, TRANSACTION_CATEGORY transactionCategory) {
+    public Transactions(String name, double amount, TRANSACTION_TYPE transactionType, TRANSACTION_CATEGORY transactionCategory) {
         this.name = name;
-        this.value = value;
+        this.amount = amount;
         this.transactionType = transactionType;
         this.transactionCategory = transactionCategory;
         this.date = LocalDate.now();
