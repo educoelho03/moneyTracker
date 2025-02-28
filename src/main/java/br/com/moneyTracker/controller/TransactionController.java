@@ -30,7 +30,7 @@ public class TransactionController {
         return ResponseEntity.status(201).body(response);
     }
 
-    @GetMapping("/all")
+    @GetMapping()
     public ResponseEntity<List<TransactionResponseDTO>> getAllTransactions(Long userId) {
         return ResponseEntity.status(200).body(transactionService.listTransactionsByUserId(userId));
     }
