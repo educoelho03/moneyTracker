@@ -25,7 +25,7 @@ public class Transactions {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user; // O nome do campo deve ser "user" para corresponder ao mappedBy
+    private User user; 
 
     public Transactions(String name, double amount, TRANSACTION_TYPE transactionType, TRANSACTION_CATEGORY transactionCategory) {
         this.name = name;
