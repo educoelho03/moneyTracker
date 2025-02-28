@@ -26,7 +26,7 @@ public class UserService {
         return email.matches(regex);
     }
 
-    public UserResponseDTO createUser(UserRequestDTO request){
+    public User createUser(UserRequestDTO request){
         if(userRepository.findByCpf(request.cpf()).isPresent()){
             throw new CpfAlreadyExistException("CPF já cadastrado.");
         }
@@ -47,13 +47,7 @@ public class UserService {
         user.setSaldo(0);
 
         User savedUser = userRepository.save(user);
-
-        return new UserResponseDTO(
-                savedUser.getuser_id(),
-                savedUser.getName(),
-                savedUser.getEmail(),
-                savedUser.getCpf()
-        );
+        return savedUser;
     }
 
 }

@@ -1,5 +1,6 @@
 package br.com.moneyTracker.dto.response;
 
+import br.com.moneyTracker.domain.entities.Transactions;
 import br.com.moneyTracker.domain.enums.TRANSACTION_CATEGORY;
 import br.com.moneyTracker.domain.enums.TRANSACTION_TYPE;
 
@@ -10,6 +11,16 @@ public record TransactionResponseDTO(
         double amount,
         TRANSACTION_TYPE transactionType,
         TRANSACTION_CATEGORY transactionCategory,
-        LocalDate date
-) {
+        LocalDate date) {
+
+    public static TransactionResponseDTO fromEntity(Transactions transaction) { // converte para DTO
+        return new TransactionResponseDTO(
+                transaction.getName(),
+                transaction.getAmount(),
+                transaction.getTransactionType(),
+                transaction.getTransactionCategory(),
+                transaction.getDate()
+        );
+    }
+
 }

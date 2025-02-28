@@ -1,5 +1,6 @@
 package br.com.moneyTracker.controller;
 
+import br.com.moneyTracker.domain.entities.User;
 import br.com.moneyTracker.dto.request.UserRequestDTO;
 import br.com.moneyTracker.dto.response.UserResponseDTO;
 import br.com.moneyTracker.service.UserService;
@@ -18,8 +19,9 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserRequestDTO request){
-        UserResponseDTO response = userService.createUser(request);
-        return ResponseEntity.status(201).body(response);
+        User createdUser = userService.createUser(request);
+        UserResponseDTO userResponse = UserResponseDTO.fromEntity(createdUser);
+        return ResponseEntity.status(201).body(userResponse);
     }
 
     @GetMapping

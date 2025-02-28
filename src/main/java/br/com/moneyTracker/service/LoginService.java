@@ -25,7 +25,7 @@ public class LoginService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public DataResponseDTO loginUser(LoginRequestDTO loginRequestDTO) {
+    public DataResponseDTO loginUser(LoginRequestDTO loginRequestDTO) { // todo: DUVIDA AQUI, NA SERVICE QUANDO USAR RESPONSE E QUANDO USAR ENTIDADE NO TIPO DE RETORNO DO METODO
         User user = userRepository.findByEmail(loginRequestDTO.email())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
@@ -51,6 +51,4 @@ public class LoginService {
         String token = tokenService.generateToken(newUser);
         return new DataResponseDTO(newUser.getName(), token);
     }
-
-
 }

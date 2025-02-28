@@ -15,7 +15,7 @@ public class Transactions {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long trasaction_id;
+    private Long transaction_id;
 
     private String name;
     private double amount;
@@ -27,12 +27,13 @@ public class Transactions {
     @JoinColumn(name = "user_id")
     private User user; 
 
-    public Transactions(String name, double amount, TRANSACTION_TYPE transactionType, TRANSACTION_CATEGORY transactionCategory) {
+    public Transactions(String name, double amount, TRANSACTION_TYPE transactionType, TRANSACTION_CATEGORY transactionCategory, User user) {
         this.name = name;
         this.amount = amount;
         this.transactionType = transactionType;
         this.transactionCategory = transactionCategory;
         this.date = LocalDate.now();
+        this.user = user;
     }
 
     public Transactions() {

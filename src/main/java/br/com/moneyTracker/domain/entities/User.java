@@ -35,7 +35,7 @@ public class User {
     }
 
 
-    public Long getuser_id() {
+    public Long getUser_id() {
         return user_id;
     }
 

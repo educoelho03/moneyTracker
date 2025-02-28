@@ -1,16 +1,18 @@
 package br.com.moneyTracker.controller;
 
+import br.com.moneyTracker.domain.entities.Transactions;
+import br.com.moneyTracker.dto.request.TransactionRequestDTO;
 import br.com.moneyTracker.dto.response.TransactionResponseDTO;
 import br.com.moneyTracker.service.TransactionService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @RestController
-@RequestMapping("api/")
+@RequestMapping("api/transactions")
 public class TransactionController {
 
     private final TransactionService transactionService;
@@ -19,7 +21,16 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
 
-    @GetMapping("/transactions")
+    @PostMapping("/add")
+    public ResponseEntity<TransactionResponseDTO> createNewTransaction(@RequestBody TransactionRequestDTO request) {
+        Transactions createdTransaction = transactionService.createNewTransaction(request.userId(), request.transaction());
+
+        // Converte a transação criada para TransactionResponseDTO
+        TransactionResponseDTO response = TransactionResponseDTO.fromEntity(createdTransaction);
+        return ResponseEntity.status(201).body(response);
+    }
+
+    @GetMapping("/all")
     public ResponseEntity<List<TransactionResponseDTO>> getAllTransactions(Long userId) {
         return ResponseEntity.status(200).body(transactionService.listTransactionsByUserId(userId));
     }
