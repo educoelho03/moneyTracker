@@ -23,7 +23,7 @@ public class TransactionController {
 
     @PostMapping("/add")
     public ResponseEntity<TransactionResponseDTO> createNewTransaction(@RequestBody TransactionRequestDTO request) {
-        Transactions createdTransaction = transactionService.createNewTransaction(request.userId(), request.transaction());
+        Transactions createdTransaction = transactionService.createNewTransaction(request.token(), request.transaction());
 
         // Converte a transação criada para TransactionResponseDTO
         TransactionResponseDTO response = TransactionResponseDTO.fromEntity(createdTransaction);
@@ -31,7 +31,7 @@ public class TransactionController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<TransactionResponseDTO>> getAllTransactions(Long userId) {
-        return ResponseEntity.status(200).body(transactionService.listTransactionsByUserId(userId));
+    public ResponseEntity<List<TransactionResponseDTO>> getAllTransactions(@RequestHeader("Authorization") String token) {
+        return ResponseEntity.status(200).body(transactionService.listTransactionsByToken(token));
     }
 }

@@ -24,8 +24,8 @@ public class TransactionService {
         this.transactionRepository = transactionRepository;
     }
 
-    public Transactions createNewTransaction(Long userId, Transactions transaction) {
-        User user = userRepository.findById(userId)
+    public Transactions createNewTransaction(String token, Transactions transaction) {
+        User user = userRepository.findByToken(token)
                 .orElseThrow(() -> new UserNotFoundException("User not found."));
 
         // Associa a transação ao usuário
@@ -44,8 +44,8 @@ public class TransactionService {
         return savedTransaction;
     }
 
-    public List<TransactionResponseDTO> listTransactionsByUserId(Long userId) { // TODO: DUVIDA AQUI, É UMA BOA PRATICA FAZER A CONVERSAO DE ENTITY PARA RESPONSE DENTRO DA SERVICE?
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found."));
+    public List<TransactionResponseDTO> listTransactionsByToken(String token) { // TODO: DUVIDA AQUI, É UMA BOA PRATICA FAZER A CONVERSAO DE ENTITY PARA RESPONSE DENTRO DA SERVICE?
+        User user = userRepository.findByToken(token).orElseThrow(() -> new UserNotFoundException("User not found."));
         return user.getTransactions().stream()
                 .map(transactions -> new TransactionResponseDTO(
                         transactions.getName(),

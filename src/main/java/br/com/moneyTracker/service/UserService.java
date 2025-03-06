@@ -27,10 +27,6 @@ public class UserService {
     }
 
     public User createUser(UserRequestDTO request){
-        if(userRepository.findByCpf(request.cpf()).isPresent()){
-            throw new CpfAlreadyExistException("CPF já cadastrado.");
-        }
-
         if(!isValidEmail(request.email())){
             throw new InvalidEmailException("E-mail invalido.");
         }
@@ -40,10 +36,9 @@ public class UserService {
         }
 
         User user = new User();
-        user.setName(request.username());
+        user.setName(request.name());
         user.setEmail(request.email());
         user.setPassword(passwordEncoder.encode(request.password())); // criptografar senha
-        user.setCpf(request.cpf());
         user.setSaldo(0);
 
         User savedUser = userRepository.save(user);
