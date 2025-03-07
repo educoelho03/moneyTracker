@@ -22,15 +22,15 @@ public class TransactionController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<TransactionResponseDTO> createNewTransaction(@RequestBody TransactionRequestDTO request) {
-        Transactions createdTransaction = transactionService.createNewTransaction(request.token(), request.transaction());
+    public ResponseEntity<TransactionResponseDTO> createNewTransaction(@RequestHeader("Authorization") String token, @RequestBody TransactionRequestDTO request) {
+        Transactions createdTransaction = transactionService.createNewTransaction(token, request.transaction());
 
         // Converte a transação criada para TransactionResponseDTO
         TransactionResponseDTO response = TransactionResponseDTO.fromEntity(createdTransaction);
         return ResponseEntity.status(201).body(response);
     }
 
-    @GetMapping() // TODO: CORRIGIR ERRO 403 NO METODO
+    @GetMapping()
     public ResponseEntity<List<TransactionResponseDTO>> getAllTransactions(@RequestHeader("Authorization") String token) {
         return ResponseEntity.status(200).body(transactionService.listTransactionsByToken(token));
     }

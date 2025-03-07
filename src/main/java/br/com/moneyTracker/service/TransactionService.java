@@ -9,12 +9,14 @@ import br.com.moneyTracker.exceptions.UserNotFoundException;
 import br.com.moneyTracker.infra.security.TokenService;
 import br.com.moneyTracker.repository.TransactionRepository;
 import br.com.moneyTracker.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class TransactionService {
 
     private final TokenService tokenService;
@@ -50,7 +52,11 @@ public class TransactionService {
     }
 
     public List<TransactionResponseDTO> listTransactionsByToken(String token) { // TODO: DUVIDA AQUI, É UMA BOA PRATICA FAZER A CONVERSAO DE ENTITY PARA RESPONSE DENTRO DA SERVICE?
-        User user = userRepository.findByToken(token).orElseThrow(() -> new UserNotFoundException("User not service found."));
+        if (token == null || token.isEmpty()) {
+            throw new IllegalArgumentException("Token inválido");
+        }
+
+        User user = userRepository.findByToken(token).orElseThrow(() -> new UserNotFoundException("User not found in repository."));
 
         return user.getTransactions().stream()
                 .map(transactions -> new TransactionResponseDTO(
