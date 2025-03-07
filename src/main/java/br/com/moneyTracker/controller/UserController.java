@@ -11,19 +11,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("api/user")
 public class UserController {
 
-    private final UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
-
-    @PostMapping("/add")
-    public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserRequestDTO request){
-        User createdUser = userService.createUser(request);
-        UserResponseDTO userResponse = UserResponseDTO.fromEntity(createdUser);
-        return ResponseEntity.status(201).body(userResponse);
-    }
-
     @GetMapping
     public ResponseEntity<String> getUser(){
         return ResponseEntity.ok("sucesso!");

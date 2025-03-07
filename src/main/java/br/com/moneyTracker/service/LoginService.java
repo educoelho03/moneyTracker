@@ -39,7 +39,7 @@ public class LoginService {
 
     public DataResponseDTO registerUser(RegisterRequestDTO registerRequestDTO) {
         if (userRepository.findByEmail(registerRequestDTO.email()).isPresent()) {
-            throw new UserAlreadyExistsException("User already exists");
+            throw new UserAlreadyExistsException("Email already exists");
         }
 
         User newUser = new User();
@@ -51,11 +51,6 @@ public class LoginService {
         newUser.setToken(token); // Define o token no usuário
 
         userRepository.save(newUser); // Salva o usuário no banco
-
-        // Log para depuração
-        System.out.println("Usuário salvo no banco: " + newUser);
-        System.out.println("Token salvo no banco: " + newUser.getToken());
-
         return new DataResponseDTO(newUser.getName(), token);
     }
 }
