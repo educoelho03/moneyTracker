@@ -46,9 +46,11 @@ public class LoginService {
         newUser.setPassword(passwordEncoder.encode(registerRequestDTO.password()));
         newUser.setEmail(registerRequestDTO.email());
         newUser.setName(registerRequestDTO.name());
-        userRepository.save(newUser);
 
         String token = tokenService.generateToken(newUser);
+        newUser.setToken(token); // TODO: VERIFICAR SALVAR TOKEN NO BANCO
+        userRepository.save(newUser);
+
         return new DataResponseDTO(newUser.getName(), token);
     }
 }

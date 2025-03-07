@@ -6,6 +6,7 @@ import br.com.moneyTracker.domain.enums.TRANSACTION_TYPE;
 import br.com.moneyTracker.dto.response.TransactionResponseDTO;
 import br.com.moneyTracker.exceptions.SaldoInsuficienteException;
 import br.com.moneyTracker.exceptions.UserNotFoundException;
+import br.com.moneyTracker.infra.security.TokenService;
 import br.com.moneyTracker.repository.TransactionRepository;
 import br.com.moneyTracker.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -16,17 +17,21 @@ import java.util.stream.Collectors;
 @Service
 public class TransactionService {
 
+    private final TokenService tokenService;
     private UserRepository userRepository;
     private TransactionRepository transactionRepository;
 
-    public TransactionService(UserRepository userRepository , TransactionRepository transactionRepository) {
+    public TransactionService(UserRepository userRepository , TransactionRepository transactionRepository, TokenService tokenService) {
         this.userRepository = userRepository;
         this.transactionRepository = transactionRepository;
+        this.tokenService = tokenService;
     }
 
     public Transactions createNewTransaction(String token, Transactions transaction) {
-        User user = userRepository.findByToken(token)
-                .orElseThrow(() -> new UserNotFoundException("User not found."));
+        String userEmail = tokenService.validateToken(token);
+
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new UserNotFoundException("UserEmail not found."));
 
         // Associa a transação ao usuário
         transaction.setUser(user);
@@ -45,7 +50,8 @@ public class TransactionService {
     }
 
     public List<TransactionResponseDTO> listTransactionsByToken(String token) { // TODO: DUVIDA AQUI, É UMA BOA PRATICA FAZER A CONVERSAO DE ENTITY PARA RESPONSE DENTRO DA SERVICE?
-        User user = userRepository.findByToken(token).orElseThrow(() -> new UserNotFoundException("User not found."));
+        User user = userRepository.findByToken(token).orElseThrow(() -> new UserNotFoundException("User not service found."));
+
         return user.getTransactions().stream()
                 .map(transactions -> new TransactionResponseDTO(
                         transactions.getName(),

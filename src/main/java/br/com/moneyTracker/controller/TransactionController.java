@@ -30,7 +30,7 @@ public class TransactionController {
         return ResponseEntity.status(201).body(response);
     }
 
-    @GetMapping()
+    @GetMapping() // TODO: CORRIGIR ERRO 403 NO METODO
     public ResponseEntity<List<TransactionResponseDTO>> getAllTransactions(@RequestHeader("Authorization") String token) {
         return ResponseEntity.status(200).body(transactionService.listTransactionsByToken(token));
     }
