@@ -37,7 +37,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/h2-console/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/register").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/transactions/add").permitAll()
                         .anyRequest().permitAll())
 
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);

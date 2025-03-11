@@ -56,7 +56,12 @@ public class TransactionService {
             throw new IllegalArgumentException("Token inválido");
         }
 
-        User user = userRepository.findByToken(token).orElseThrow(() -> new UserNotFoundException("User not found in repository."));
+        String userEmail = tokenService.validateToken(token);
+        if (userEmail == null || userEmail.isEmpty()) {
+            throw new IllegalArgumentException("Token inválido ou expirado");
+        }
+
+        User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new UserNotFoundException("User not found in repository."));
 
         return user.getTransactions().stream()
                 .map(transactions -> new TransactionResponseDTO(

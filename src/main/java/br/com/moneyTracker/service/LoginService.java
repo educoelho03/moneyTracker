@@ -48,7 +48,7 @@ public class LoginService {
         newUser.setName(registerRequestDTO.name());
 
         String token = tokenService.generateToken(newUser);
-        newUser.setToken(token); // Define o token no usuário
+        // newUser.setToken(token); // Define o token no usuário
 
         userRepository.save(newUser); // Salva o usuário no banco
         return new DataResponseDTO(newUser.getName(), token);

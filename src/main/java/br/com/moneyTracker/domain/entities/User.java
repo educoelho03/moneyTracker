@@ -17,7 +17,6 @@ public class User {
     private String email;
     private String password;
     private double saldo;
-    private String token;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Transactions> transactions = new ArrayList<>();
@@ -80,13 +79,5 @@ public class User {
 
     public void setTransactions(List<Transactions> transactions) {
         this.transactions = transactions;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
     }
 }
