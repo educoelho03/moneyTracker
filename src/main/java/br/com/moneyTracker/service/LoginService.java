@@ -30,7 +30,7 @@ public class LoginService {
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         if (!passwordEncoder.matches(loginRequestDTO.password(), user.getPassword())) {
-            throw new InvalidCredentialsException("Invalid credentials");
+            throw new InvalidCredentialsException("Senha Invalida.");
         }
 
         String token = tokenService.generateToken(user);

@@ -3,9 +3,7 @@ package br.com.moneyTracker.service;
 import br.com.moneyTracker.domain.entities.User;
 import br.com.moneyTracker.dto.request.UserRequestDTO;
 import br.com.moneyTracker.dto.response.UserResponseDTO;
-import br.com.moneyTracker.exceptions.CpfAlreadyExistException;
-import br.com.moneyTracker.exceptions.EmailAlreadyExistException;
-import br.com.moneyTracker.exceptions.InvalidEmailException;
+import br.com.moneyTracker.exceptions.*;
 import br.com.moneyTracker.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,6 +23,18 @@ public class UserService {
         String regex = "^[A-Za-z0-9+_.-]+@(.+)$";
         return email.matches(regex);
     }
+
+    public void updateUserPassword(String email, String newPassword) {
+       User userRecovery = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("user with this email :" + email + " not found"));
+
+       if(passwordEncoder.matches(newPassword, userRecovery.getPassword())) {
+           throw new SamePasswordException("Password must be different");
+       }
+
+       userRecovery.setPassword(passwordEncoder.encode(newPassword));
+       userRepository.save(userRecovery);
+    }
+
 
     public User createUser(UserRequestDTO request){
         if(!isValidEmail(request.email())){

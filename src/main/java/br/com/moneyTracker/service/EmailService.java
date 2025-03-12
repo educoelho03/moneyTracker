@@ -29,4 +29,30 @@ public class EmailService implements EmailInterface {
         javaMailSender.send(message);
         return "Mail sent successfully...";
     }
+
+    @Override
+    public String sendPasswordResetEmail(String email) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+
+            String resetPasswordLink = "http://localhost:5173/reset-password";
+            String emailBody = "Olá,\n\n"
+                    + "Você solicitou a redefinição de sua senha. Por favor, clique no link abaixo para redefinir sua senha:\n\n"
+                    + resetPasswordLink + "\n\n"
+                    + "Atenciosamente,\n"
+                    + "Equipe MoneyTracker";
+
+            message.setFrom(sender);
+            message.setTo(email);
+            message.setSubject("Redefinir Senha");
+            message.setText(emailBody);
+
+            javaMailSender.send(message);
+            return "Mail sent successfully...";
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "Mail sent...";
+    }
+
 }
