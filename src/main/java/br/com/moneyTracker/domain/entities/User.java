@@ -21,13 +21,14 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Transactions> transactions = new ArrayList<>();
 
-    public User(Long user_id, String name, String email, String password) {
+    public User(Long user_id, String name, String email, String password, double saldo) {
         this.user_id = user_id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.saldo = 0;
     }
+
 
     public User() {
     }

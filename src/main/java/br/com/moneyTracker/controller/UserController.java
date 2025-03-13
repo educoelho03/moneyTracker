@@ -1,11 +1,7 @@
 package br.com.moneyTracker.controller;
 
-import br.com.moneyTracker.domain.entities.User;
 import br.com.moneyTracker.dto.request.ResetPasswordRequestDTO;
-import br.com.moneyTracker.dto.request.UserRequestDTO;
-import br.com.moneyTracker.dto.response.UserResponseDTO;
 import br.com.moneyTracker.service.UserService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
