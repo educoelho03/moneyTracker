@@ -35,7 +35,7 @@ public class LoginController {
     @PostMapping("/register")
     public ResponseEntity<DataResponseDTO> registerUser(@RequestBody RegisterRequestDTO body) {
         DataResponseDTO response = loginService.registerUser(body);
-        //emailService.sendMail(new EmailDetails(body.email(), "User Register", "Usuario cadastrado com sucesso!"));
+        //emailService.sendMail(new EmailDetails(body.email(), "Money Tracker - Conta criada", "Usuario cadastrado com sucesso!"));
         return ResponseEntity.ok(response);
     }
 }
