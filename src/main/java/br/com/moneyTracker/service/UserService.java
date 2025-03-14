@@ -1,6 +1,7 @@
 package br.com.moneyTracker.service;
 
 import br.com.moneyTracker.domain.entities.User;
+import br.com.moneyTracker.exceptions.PasswordNullException;
 import br.com.moneyTracker.exceptions.SamePasswordException;
 import br.com.moneyTracker.exceptions.UserNotFoundException;
 import br.com.moneyTracker.repository.UserRepository;
@@ -19,13 +20,25 @@ public class UserService {
     }
 
     public void updateUserPassword(String email, String newPassword) {
-       User userRecovery = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("user with this email :" + email + " not found"));
+        try {
+            if (email == null) {
+                throw new UserNotFoundException("user email cannot be null");
+            }
 
-       if(passwordEncoder.matches(newPassword, userRecovery.getPassword())) {
-           throw new SamePasswordException("Password must be different");
-       }
+            if (newPassword == null || newPassword.isEmpty()) {
+                throw new PasswordNullException("password cannot be null");
+            }
 
-       userRecovery.setPassword(passwordEncoder.encode(newPassword));
-       userRepository.save(userRecovery);
+            User userRecovery = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User with this email : " + email + " not found"));
+
+            if(passwordEncoder.matches(newPassword, userRecovery.getPassword())) {
+                throw new SamePasswordException("Password must be different");
+            }
+
+            userRecovery.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(userRecovery);
+        } catch (RuntimeException e){
+            throw new UserNotFoundException("Error to search Email = " + email, e);
+        }
     }
 }
