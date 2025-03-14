@@ -1,6 +1,7 @@
 package br.com.moneyTracker.service;
 
 import br.com.moneyTracker.dto.EmailDetails;
+import br.com.moneyTracker.exceptions.SendMailException;
 import br.com.moneyTracker.interfaces.EmailInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,20 +20,32 @@ public class EmailService implements EmailInterface {
 
     @Override
     public String sendMail(EmailDetails emailDetails) {
-        SimpleMailMessage message = new SimpleMailMessage();
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
 
-        message.setFrom(sender);
-        message.setTo(emailDetails.getTo());
-        message.setSubject(emailDetails.getSubject());
-        message.setText(emailDetails.getBody());
+            if (emailDetails.getTo() == null || emailDetails.getSubject() == null || emailDetails.getBody() == null) {
+                throw new SendMailException("Email details cannot be null");
+            }
 
-        javaMailSender.send(message);
-        return "Mail sent successfully...";
+            message.setFrom(sender);
+            message.setTo(emailDetails.getTo());
+            message.setSubject(emailDetails.getSubject());
+            message.setText(emailDetails.getBody());
+
+            javaMailSender.send(message);
+            return "Mail sent successfully...";
+        } catch (Exception e){
+            throw new SendMailException("Error to send email", e);
+        }
     }
 
     @Override
     public String sendPasswordResetEmail(String email) {
         try {
+            if(email == null || email.trim().isEmpty()) {
+                throw new SendMailException("Email cannot be null or empty");
+            }
+
             SimpleMailMessage message = new SimpleMailMessage();
 
             String resetPasswordLink = "http://localhost:5173/reset-password";
@@ -50,9 +63,8 @@ public class EmailService implements EmailInterface {
             javaMailSender.send(message);
             return "Mail sent successfully...";
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new SendMailException("Error to send password reset email", e);
         }
-        return "Mail sent...";
     }
 
 }

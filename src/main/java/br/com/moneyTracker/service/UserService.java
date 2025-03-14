@@ -20,25 +20,17 @@ public class UserService {
     }
 
     public void updateUserPassword(String email, String newPassword) {
-        try {
-            if (email == null) {
-                throw new UserNotFoundException("user email cannot be null");
-            }
-
-            if (newPassword == null || newPassword.isEmpty()) {
-                throw new PasswordNullException("password cannot be null");
-            }
-
-            User userRecovery = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User with this email : " + email + " not found"));
-
-            if(passwordEncoder.matches(newPassword, userRecovery.getPassword())) {
-                throw new SamePasswordException("Password must be different");
-            }
-
-            userRecovery.setPassword(passwordEncoder.encode(newPassword));
-            userRepository.save(userRecovery);
-        } catch (RuntimeException e){
-            throw new UserNotFoundException("Error to search Email = " + email, e);
+        if (email == null) {
+            throw new UserNotFoundException("user email cannot be null");
         }
+        if (newPassword == null || newPassword.isEmpty()) {
+            throw new PasswordNullException("password cannot be null");
+        }
+        User userRecovery = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User with this email : " + email + " not found"));
+        if(passwordEncoder.matches(newPassword, userRecovery.getPassword())) {
+            throw new SamePasswordException("Password must be different");
+        }
+        userRecovery.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(userRecovery);
     }
 }

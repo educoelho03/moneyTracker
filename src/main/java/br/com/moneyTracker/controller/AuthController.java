@@ -1,11 +1,10 @@
 package br.com.moneyTracker.controller;
 
-import br.com.moneyTracker.dto.EmailDetails;
-import br.com.moneyTracker.dto.request.LoginRequestDTO;
-import br.com.moneyTracker.dto.request.RegisterRequestDTO;
+import br.com.moneyTracker.dto.request.AuthLoginRequestDTO;
+import br.com.moneyTracker.dto.request.AuthRegisterRequestDTO;
 import br.com.moneyTracker.dto.response.DataResponseDTO;
 import br.com.moneyTracker.service.EmailService;
-import br.com.moneyTracker.service.LoginService;
+import br.com.moneyTracker.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,27 +13,27 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
-public class LoginController {
+public class AuthController {
 
-    private final LoginService loginService;
+    private final AuthService authService;
     private final EmailService emailService;
 
-    public LoginController(LoginService loginService, EmailService emailService) {
-        this.loginService = loginService;
+    public AuthController(AuthService authService, EmailService emailService) {
+        this.authService = authService;
         this.emailService = emailService;
     }
 
 
     @PostMapping("/login")
-    public ResponseEntity<DataResponseDTO> loginUser(@RequestBody LoginRequestDTO body) {
-        DataResponseDTO response = loginService.loginUser(body);
+    public ResponseEntity<DataResponseDTO> loginUser(@RequestBody AuthLoginRequestDTO body) {
+        DataResponseDTO response = authService.loginUser(body);
 
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<DataResponseDTO> registerUser(@RequestBody RegisterRequestDTO body) {
-        DataResponseDTO response = loginService.registerUser(body);
+    public ResponseEntity<DataResponseDTO> registerUser(@RequestBody AuthRegisterRequestDTO body) {
+        DataResponseDTO response = authService.registerUser(body);
         //emailService.sendMail(new EmailDetails(body.email(), "Money Tracker - Conta criada", "Usuario cadastrado com sucesso!"));
         return ResponseEntity.ok(response);
     }
