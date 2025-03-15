@@ -5,12 +5,14 @@ import br.com.moneyTracker.dto.request.AuthLoginRequestDTO;
 import br.com.moneyTracker.dto.request.AuthRegisterRequestDTO;
 import br.com.moneyTracker.dto.response.DataResponseDTO;
 import br.com.moneyTracker.exceptions.InvalidCredentialsException;
+import br.com.moneyTracker.exceptions.UserNotFoundException;
 import br.com.moneyTracker.infra.security.TokenService;
 import br.com.moneyTracker.repository.UserRepository;
 import br.com.moneyTracker.service.AuthService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -82,39 +84,58 @@ public class AuthServiceTest {
         assertThat(invalidCredentialsException, notNullValue());
         assertThat(invalidCredentialsException.getMessage(), is("Wrong Password."));
         assertThat(invalidCredentialsException.getCause(), nullValue());
-        assertThat(invalidCredentialsException.getCause(), is(new InvalidCredentialsException("Wrong Password")));
 
         verify(userRepository, times(1)).findByEmail(authLoginRequestDTO.email());
     }
 
 
-
     @Test
     void registerUserWithSuccess() {
+        // Arrange
         authRegisterRequestDTO = new AuthRegisterRequestDTO("Eduardo", "teste@gmail.com", "password");
 
-        User newUser = new User();
-        newUser.setName(authRegisterRequestDTO.name());
-        newUser.setEmail(authRegisterRequestDTO.email());
-        newUser.setPassword("encodedPassword");
+        // Configura os mocks
+        when(userRepository.findByEmail(authRegisterRequestDTO.email())).thenReturn(Optional.empty()); // Usuário não existe
+        when(passwordEncoder.encode(authRegisterRequestDTO.password())).thenReturn("encodedPassword"); // Simula a codificação da senha
+        when(tokenService.generateToken(ArgumentMatchers.any(User.class))).thenReturn("generatedToken"); // Aceita qualquer User
+        when(userRepository.save(ArgumentMatchers.any(User.class))).thenAnswer(invocation -> invocation.getArgument(0)); // Retorna o User salvo
 
-        when(userRepository.findByEmail(authRegisterRequestDTO.email())).thenReturn(Optional.empty()); // retornar vazio = usuario nao existe(pode ser registrado)
-        when(passwordEncoder.encode(authRegisterRequestDTO.password())).thenReturn("encodedPassword");
-        when(tokenService.generateToken(user)).thenReturn("generatedToken");
-        when(userRepository.save(user)).thenReturn(newUser);
-
+        // Act
         response = authService.registerUser(authRegisterRequestDTO);
 
+        // Assert
         assertNotNull(response);
         assertNotNull(response.token());
         assertEquals("Eduardo", response.name());
         assertEquals("generatedToken", response.token());
 
-        verify(userRepository, times(1)).save(user);
-        verify(passwordEncoder, times(1)).encode(authRegisterRequestDTO.password());
-        verify(tokenService, times(1)).generateToken(user);
+        // Verifica as interações com os mocks
+        verify(userRepository, times(1)).save(ArgumentMatchers.any(User.class)); // Verifica se o User foi salvo
+        verify(passwordEncoder, times(1)).encode(authRegisterRequestDTO.password()); // Verifica se a senha foi codificada
+        verify(tokenService, times(1)).generateToken(ArgumentMatchers.any(User.class)); // Verifica se o token foi gerado
     }
 
+    @Test
+    void callExceptionWhenRepositoryFailed() {
+        // Arrange
+        authRegisterRequestDTO = new AuthRegisterRequestDTO("Eduardo", "teste@gmail.com", "password");
+        when(userRepository.findByEmail(authRegisterRequestDTO.email())).thenThrow(new RuntimeException("User not found"));
 
+        // Act & Assert
+        UserNotFoundException userNotFoundException = assertThrows(UserNotFoundException.class, () -> {
+            authService.registerUser(authRegisterRequestDTO);
+        });
+
+        // Verifica a exceção
+        assertThat(userNotFoundException, notNullValue()); // Verifica se a exceção foi lançada
+        assertThat(userNotFoundException.getMessage(), is("Error to register user.")); // Verifica a mensagem da exceção
+        assertThat(userNotFoundException.getCause(), notNullValue()); // Verifica se a causa não é nula
+        assertThat(userNotFoundException.getCause().getClass(), is(RuntimeException.class)); // Verifica o tipo da causa
+        assertThat(userNotFoundException.getCause().getMessage(), is("User not found")); // Verifica a mensagem da causa
+
+        // Verifica as interações com os mocks
+        verify(userRepository, times(1)).findByEmail(authRegisterRequestDTO.email());
+        verifyNoMoreInteractions(userRepository);
+    }
 
 }

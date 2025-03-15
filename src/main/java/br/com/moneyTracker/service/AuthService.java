@@ -38,19 +38,25 @@ public class AuthService {
     }
 
     public DataResponseDTO registerUser(AuthRegisterRequestDTO authRegisterRequestDTO) {
-        if (userRepository.findByEmail(authRegisterRequestDTO.email()).isPresent()) {
-            throw new UserAlreadyExistsException("Email already exists");
+        try {
+            if (userRepository.findByEmail(authRegisterRequestDTO.email()).isPresent()) {
+                throw new UserAlreadyExistsException("Email already exists");
+            }
+
+            User newUser = new User();
+            newUser.setPassword(passwordEncoder.encode(authRegisterRequestDTO.password()));
+            newUser.setEmail(authRegisterRequestDTO.email());
+            newUser.setName(authRegisterRequestDTO.name());
+
+            String token = tokenService.generateToken(newUser);
+            // newUser.setToken(token); // Define o token no usuário
+
+            userRepository.save(newUser); // Salva o usuário no banco
+            return new DataResponseDTO(newUser.getName(), token);
+        } catch (Exception e) {
+            throw new UserNotFoundException("Error to register user.", e);
         }
-
-        User newUser = new User();
-        newUser.setPassword(passwordEncoder.encode(authRegisterRequestDTO.password()));
-        newUser.setEmail(authRegisterRequestDTO.email());
-        newUser.setName(authRegisterRequestDTO.name());
-
-        String token = tokenService.generateToken(newUser);
-        // newUser.setToken(token); // Define o token no usuário
-
-        userRepository.save(newUser); // Salva o usuário no banco
-        return new DataResponseDTO(newUser.getName(), token);
     }
+
+
 }
