@@ -30,6 +30,7 @@ public class TransactionService {
     }
 
     public Transactions createNewTransaction(String token, Transactions transaction) {
+        // TODO: VERIFICAR AS LINHAS 34 E 36,37 para melhorar os nomes, pois userEmail esta fazendo a validação do token.
         String userEmail = tokenService.validateToken(token);
 
         User user = userRepository.findByEmail(userEmail)

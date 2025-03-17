@@ -41,5 +41,4 @@ public class Transactions {
         this.date = LocalDate.now(); // quando o spring deserializa o json ele usa o construtor padrao
     }
 
-
 }
