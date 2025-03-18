@@ -4,6 +4,7 @@ import br.com.moneyTracker.domain.entities.Transactions;
 import br.com.moneyTracker.domain.entities.User;
 import br.com.moneyTracker.domain.enums.TRANSACTION_TYPE;
 import br.com.moneyTracker.dto.response.TransactionResponseDTO;
+import br.com.moneyTracker.exceptions.InvalidTokenException;
 import br.com.moneyTracker.exceptions.SaldoInsuficienteException;
 import br.com.moneyTracker.exceptions.UserNotFoundException;
 import br.com.moneyTracker.infra.security.TokenService;
@@ -30,11 +31,14 @@ public class TransactionService {
     }
 
     public Transactions createNewTransaction(String token, Transactions transaction) {
-        // TODO: VERIFICAR AS LINHAS 34 E 36,37 para melhorar os nomes, pois userEmail esta fazendo a validação do token.
         String userEmail = tokenService.validateToken(token);
 
+        // if(userEmail == null) {
+        //     throw new InvalidTokenException("Invalid token");
+        // }
+
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new UserNotFoundException("UserEmail not found."));
+                .orElseThrow(() -> new UserNotFoundException("User with this email not found"));
 
         // Associa a transação ao usuário
         transaction.setUser(user);
@@ -54,15 +58,16 @@ public class TransactionService {
 
     public List<TransactionResponseDTO> listTransactionsByToken(String token) { // TODO: DUVIDA AQUI, É UMA BOA PRATICA FAZER A CONVERSAO DE ENTITY PARA RESPONSE DENTRO DA SERVICE?
         if (token == null || token.isEmpty()) {
-            throw new IllegalArgumentException("Token inválido");
+            throw new InvalidTokenException("Invalid token");
         }
 
         String userEmail = tokenService.validateToken(token);
+
         if (userEmail == null || userEmail.isEmpty()) {
-            throw new IllegalArgumentException("Token inválido ou expirado");
+            throw new InvalidTokenException("Invalid or expired token");
         }
 
-        User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new UserNotFoundException("User not found in repository."));
+        User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new UserNotFoundException("User with this email not found"));
 
         return user.getTransactions().stream()
                 .map(transactions -> new TransactionResponseDTO(
