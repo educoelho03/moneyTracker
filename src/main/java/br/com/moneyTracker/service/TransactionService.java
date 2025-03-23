@@ -5,7 +5,6 @@ import br.com.moneyTracker.domain.entities.User;
 import br.com.moneyTracker.domain.enums.TRANSACTION_TYPE;
 import br.com.moneyTracker.dto.response.TransactionResponseDTO;
 import br.com.moneyTracker.exceptions.InvalidTokenException;
-import br.com.moneyTracker.exceptions.SaldoInsuficienteException;
 import br.com.moneyTracker.exceptions.UserNotFoundException;
 import br.com.moneyTracker.infra.security.TokenService;
 import br.com.moneyTracker.repository.TransactionRepository;
