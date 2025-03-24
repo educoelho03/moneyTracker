@@ -42,10 +42,7 @@ public class EmailService implements EmailInterface {
     @Override
     public String sendPasswordResetEmail(String email) {
         try {
-            if(email == null || email.trim().isEmpty()) {
-                throw new SendMailException("Email cannot be null or empty");
-            }
-
+            validateEmailIsNotNullOrEmpty(email);
             SimpleMailMessage message = new SimpleMailMessage();
 
             String resetPasswordLink = "http://localhost:5173/reset-password";
@@ -64,6 +61,12 @@ public class EmailService implements EmailInterface {
             return "Mail sent successfully...";
         } catch (Exception e) {
             throw new SendMailException("Error to send password reset email", e);
+        }
+    }
+
+    private void validateEmailIsNotNullOrEmpty(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            throw new SendMailException("Email cannot be null or empty");
         }
     }
 

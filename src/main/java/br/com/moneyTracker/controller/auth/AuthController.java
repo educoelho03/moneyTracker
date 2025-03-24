@@ -1,4 +1,4 @@
-package br.com.moneyTracker.controller;
+package br.com.moneyTracker.controller.auth;
 
 import br.com.moneyTracker.dto.request.AuthLoginRequestDTO;
 import br.com.moneyTracker.dto.request.AuthRegisterRequestDTO;

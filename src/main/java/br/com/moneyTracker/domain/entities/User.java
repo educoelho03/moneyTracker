@@ -21,7 +21,7 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Transactions> transactions = new ArrayList<>();
 
-    public User(Long user_id, String name, String email, String password, double saldo) {
+    public User(Long user_id, String name, String email, String password) {
         this.user_id = user_id;
         this.name = name;
         this.email = email;
@@ -29,6 +29,11 @@ public class User {
         this.saldo = 0;
     }
 
+    public User(String name, String email, String password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+    }
 
     public User() {
     }

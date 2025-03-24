@@ -5,6 +5,7 @@ import br.com.moneyTracker.domain.entities.User;
 import br.com.moneyTracker.domain.enums.TRANSACTION_TYPE;
 import br.com.moneyTracker.dto.response.TransactionResponseDTO;
 import br.com.moneyTracker.exceptions.InvalidTokenException;
+import br.com.moneyTracker.exceptions.SaldoInsuficienteException;
 import br.com.moneyTracker.exceptions.UserNotFoundException;
 import br.com.moneyTracker.infra.security.TokenService;
 import br.com.moneyTracker.repository.TransactionRepository;
@@ -16,43 +17,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j
 public class TransactionService {
 
     private final TokenService tokenService;
+    private final UserService userService;
     private UserRepository userRepository;
     private TransactionRepository transactionRepository;
 
-    public TransactionService(UserRepository userRepository , TransactionRepository transactionRepository, TokenService tokenService) {
+    public TransactionService(UserRepository userRepository , TransactionRepository transactionRepository, TokenService tokenService, UserService userService) {
         this.userRepository = userRepository;
         this.transactionRepository = transactionRepository;
         this.tokenService = tokenService;
-    }
-
-    public Transactions createNewTransaction(String token, Transactions transaction) {
-        String userEmail = tokenService.validateToken(token);
-
-        // if(userEmail == null) {
-        //     throw new InvalidTokenException("Invalid token");
-        // }
-
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new UserNotFoundException("User with this email not found"));
-
-        // Associa a transação ao usuário
-        transaction.setUser(user);
-
-        if (transaction.getTransactionType() == TRANSACTION_TYPE.DESPESA) {
-            user.setSaldo(user.getSaldo() - transaction.getAmount());
-        } else if (transaction.getTransactionType() == TRANSACTION_TYPE.DEPOSITO) {
-            user.setSaldo(user.getSaldo() + transaction.getAmount());
-        }
-
-        Transactions savedTransaction = transactionRepository.save(transaction);
-        userRepository.save(user);
-
-        // Retorna a transação criada
-        return savedTransaction;
+        this.userService = userService;
     }
 
     public List<TransactionResponseDTO> listTransactionsByToken(String token) { // TODO: DUVIDA AQUI, É UMA BOA PRATICA FAZER A CONVERSAO DE ENTITY PARA RESPONSE DENTRO DA SERVICE?
@@ -66,7 +42,7 @@ public class TransactionService {
             throw new InvalidTokenException("Invalid or expired token");
         }
 
-        User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new UserNotFoundException("User with this email not found"));
+        User user = userService.findUserByEmail(userEmail);
 
         return user.getTransactions().stream()
                 .map(transactions -> new TransactionResponseDTO(
@@ -76,5 +52,40 @@ public class TransactionService {
                         transactions.getTransactionCategory(),
                         transactions.getDate()
                 )).collect(Collectors.toList());
+    }
+
+    public Transactions createNewTransaction(String token, Transactions transaction) {
+        String userEmail = tokenService.validateToken(token); // TODO: REVER ESSE PONTO
+        User user = userService.findUserByEmail(userEmail);
+
+        // Associa a transação ao usuário
+        transaction.setUser(user);
+
+        calculateAmount(user, transaction);
+        Transactions savedTransaction = transactionRepository.save(transaction);
+        userRepository.save(user);
+
+        return savedTransaction;
+    }
+
+    public void calculateAmount(User user, Transactions transaction) {
+        if (transaction.getTransactionType() == TRANSACTION_TYPE.DESPESA) {
+            subtractToBalance(user, transaction.getAmount());
+        } else if (transaction.getTransactionType() == TRANSACTION_TYPE.DEPOSITO) {
+            addToBalance(user, transaction.getAmount());
+        }
+    }
+
+    private void addToBalance(User user, double amount){
+        double newBalance = user.getSaldo() + amount;
+        user.setSaldo(newBalance);
+    }
+
+    private void subtractToBalance(User user, double amount){
+        double newBalance = user.getSaldo() - amount;
+        if(newBalance < 0){
+            throw new SaldoInsuficienteException("Saldo insuficiente para realizar a transação.");
+        }
+        user.setSaldo(newBalance);
     }
 }
