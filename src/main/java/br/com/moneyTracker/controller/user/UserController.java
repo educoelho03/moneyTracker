@@ -1,4 +1,4 @@
-package br.com.moneyTracker.controller;
+package br.com.moneyTracker.controller.user;
 
 import br.com.moneyTracker.dto.request.ResetPasswordRequestDTO;
 import br.com.moneyTracker.service.UserService;

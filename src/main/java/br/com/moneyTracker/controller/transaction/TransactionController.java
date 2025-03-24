@@ -1,17 +1,13 @@
-package br.com.moneyTracker.controller;
+package br.com.moneyTracker.controller.transaction;
 
 import br.com.moneyTracker.domain.entities.Transactions;
 import br.com.moneyTracker.dto.request.TransactionRequestDTO;
 import br.com.moneyTracker.dto.response.TransactionResponseDTO;
 import br.com.moneyTracker.service.TransactionService;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("api/transactions")

@@ -1,6 +1,5 @@
-package br.com.moneyTracker.controller;
+package br.com.moneyTracker.controller.email;
 
-import br.com.moneyTracker.dto.EmailDetails;
 import br.com.moneyTracker.dto.request.EmailRequestDTO;
 import br.com.moneyTracker.service.EmailService;
 import org.springframework.http.HttpStatus;

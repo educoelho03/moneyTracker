@@ -8,50 +8,43 @@ import br.com.moneyTracker.exceptions.InvalidCredentialsException;
 import br.com.moneyTracker.exceptions.UserAlreadyExistsException;
 import br.com.moneyTracker.exceptions.UserNotFoundException;
 import br.com.moneyTracker.infra.security.TokenService;
+import br.com.moneyTracker.interfaces.AuthServiceInterface;
 import br.com.moneyTracker.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AuthService {
+public class AuthService implements AuthServiceInterface {
 
     private final UserRepository userRepository;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
 
-    public AuthService(UserRepository userRepository, TokenService tokenService, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository, TokenService tokenService, PasswordEncoder passwordEncoder, UserService userService) {
         this.userRepository = userRepository;
         this.tokenService = tokenService;
         this.passwordEncoder = passwordEncoder;
+        this.userService = userService;
     }
 
+    @Override
     public DataResponseDTO loginUser(AuthLoginRequestDTO authLoginRequestDTO) { // todo: DUVIDA AQUI, NA SERVICE QUANDO USAR RESPONSE E QUANDO USAR ENTIDADE NO TIPO DE RETORNO DO METODO
-        User user = userRepository.findByEmail(authLoginRequestDTO.email())
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        User userRecovery = userService.findUserByEmail(authLoginRequestDTO.email());
 
-        if (!passwordEncoder.matches(authLoginRequestDTO.password(), user.getPassword())) {
+        if (!passwordEncoder.matches(authLoginRequestDTO.password(), userRecovery.getPassword())) {
             throw new InvalidCredentialsException("Wrong Password.");
         }
 
-        String token = tokenService.generateToken(user);
-        return new DataResponseDTO(user.getName(), token);
+        String token = tokenService.generateToken(userRecovery);
+        return new DataResponseDTO(userRecovery.getName(), token);
     }
 
+    @Override
     public DataResponseDTO registerUser(AuthRegisterRequestDTO authRegisterRequestDTO) {
         try {
-            if (userRepository.findByEmail(authRegisterRequestDTO.email()).isPresent()) {
-                throw new UserAlreadyExistsException("Email already exists");
-            }
-
-            User newUser = new User();
-            newUser.setPassword(passwordEncoder.encode(authRegisterRequestDTO.password()));
-            newUser.setEmail(authRegisterRequestDTO.email());
-            newUser.setName(authRegisterRequestDTO.name());
-
+            User newUser = userService.registerUser(authRegisterRequestDTO);
             String token = tokenService.generateToken(newUser);
-            // newUser.setToken(token); // Define o token no usuário
-
-            userRepository.save(newUser); // Salva o usuário no banco
             return new DataResponseDTO(newUser.getName(), token);
         } catch (Exception e) {
             throw new UserNotFoundException("Error to register user.", e);
