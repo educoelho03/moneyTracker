@@ -59,7 +59,7 @@ public class TransactionServiceTest {
     @Test
     void addNewTransactionWithSuccess() {
         when(tokenService.validateToken(token)).thenReturn("teste@gmail.com"); // Simula a validação do token
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.ofNullable(user)); // Simula a busca do usuário
+        when(userRepository.findUserByEmail(user.getEmail())).thenReturn(Optional.ofNullable(user)); // Simula a busca do usuário
         when(transactionRepository.save(transaction)).thenReturn(transaction); // Simula a criação da transação
 
         Transactions savedTransactions = transactionService.createNewTransaction(token, transaction);
@@ -74,7 +74,7 @@ public class TransactionServiceTest {
         assertEquals(20.0, user.getSaldo() + savedTransactions.getAmount());
 
         verify(tokenService, times(1)).validateToken(token); // Verifica se o token foi validado
-        verify(userRepository, times(1)).findByEmail("teste@gmail.com"); // Verifica se o usuário foi buscado pelo email
+        verify(userRepository, times(1)).findUserByEmail("teste@gmail.com"); // Verifica se o usuário foi buscado pelo email
         verify(transactionRepository, times(1)).save(transaction); // Verifica se a transação foi salva
         verify(userRepository, times(1)).save(user); // Verifica se o usuário foi salvo
     }
@@ -100,7 +100,7 @@ public class TransactionServiceTest {
         when(tokenService.validateToken(token)).thenReturn("teste@gmail.com");
 
         // Mock do userRepository
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user)); // Simula a busca do usuário
+        when(userRepository.findUserByEmail(user.getEmail())).thenReturn(Optional.of(user)); // Simula a busca do usuário
 
         List<TransactionResponseDTO> result = transactionService.listTransactionsByToken(token);
 
@@ -118,6 +118,6 @@ public class TransactionServiceTest {
         assertEquals(TRANSACTION_CATEGORY.TRANSPORT, result.get(1).transactionCategory());
 
         verify(tokenService, times(1)).validateToken(token);
-        verify(userRepository, times(1)).findByEmail(user.getEmail());
+        verify(userRepository, times(1)).findUserByEmail(user.getEmail());
     }
 }

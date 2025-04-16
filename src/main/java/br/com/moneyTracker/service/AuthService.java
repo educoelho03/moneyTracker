@@ -9,6 +9,7 @@ import br.com.moneyTracker.exceptions.UserAlreadyExistsException;
 import br.com.moneyTracker.exceptions.UserNotFoundException;
 import br.com.moneyTracker.infra.security.TokenService;
 import br.com.moneyTracker.interfaces.AuthServiceInterface;
+import br.com.moneyTracker.interfaces.EmailInterface;
 import br.com.moneyTracker.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,16 +17,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthService implements AuthServiceInterface {
 
-    private final UserRepository userRepository;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
+    private final EmailService emailService;
 
-    public AuthService(UserRepository userRepository, TokenService tokenService, PasswordEncoder passwordEncoder, UserService userService) {
-        this.userRepository = userRepository;
+    public AuthService(TokenService tokenService, PasswordEncoder passwordEncoder, UserService userService, EmailService emailService) {
         this.tokenService = tokenService;
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
+        this.emailService = emailService;
     }
 
     @Override
@@ -45,6 +46,19 @@ public class AuthService implements AuthServiceInterface {
         try {
             User newUser = userService.registerUser(authRegisterRequestDTO);
             String token = tokenService.generateToken(newUser);
+
+            var message = EmailInterface.Message.builder()
+                    .to(newUser.getEmail())
+                    .subject("🎉 You’re in! Welcome to MoneyTracker.")
+                    .body("Hi " + newUser.getName() + ",\n\n" +
+                            "Welcome to MoneyTracker – we’re glad to have you on board!\n\n" +
+                            "Your account is ready, and you can now start exploring all the features we’ve prepared for you.\n\n" +
+                            "Need help? We’re here anytime.\n\n" +
+                            "Let’s get started! 🚀\n" +
+                            "— The MoneyTracker Team"
+                    ).build();
+
+            emailService.sendMail(message);
             return new DataResponseDTO(newUser.getName(), token);
         } catch (Exception e) {
             throw new UserNotFoundException("Error to register user.", e);

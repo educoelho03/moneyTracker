@@ -47,7 +47,7 @@ public class UserService implements UserServiceInterface {
     }
 
     public User findUserByEmail(String email) { // TODO: DUVIDA SOBRE COMO APLICAR O SOLID PARA REPOSITORIOS
-        return userRepository.findByEmail(email)
+        return userRepository.findUserByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User with this email : " + email + " not found"));
     }
 

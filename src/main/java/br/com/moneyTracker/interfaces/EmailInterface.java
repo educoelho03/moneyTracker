@@ -1,10 +1,20 @@
 package br.com.moneyTracker.interfaces;
 
-import br.com.moneyTracker.dto.EmailDetails;
+import lombok.Builder;
+import lombok.Getter;
 
+// TODO: DEVO CRIAR UM METODO DE WELCOME BUILD EMAIL
 public interface EmailInterface {
 
-    String sendMail(EmailDetails emailDetails);
-    String sendPasswordResetEmail(String email);
+    void sendMail(Message message);
 
+    @Getter
+    @Builder
+    class Message {
+
+        private String to;
+        private String subject;
+        private String body;
+
+    }
 }

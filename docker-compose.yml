@@ -18,7 +18,7 @@ services:
   db:
     image: postgres:latest
     restart: always
-    container_name: db
+    container_name: moneyTracker-db
     env_file:
       - .env
     ports:

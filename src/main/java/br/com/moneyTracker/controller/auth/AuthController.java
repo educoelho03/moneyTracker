@@ -47,7 +47,6 @@ public class AuthController {
     @ApiResponse(responseCode = "500", description = "Erro no servidor")
     public ResponseEntity<DataResponseDTO> registerUser(@RequestBody AuthRegisterRequestDTO body) {
         DataResponseDTO response = authService.registerUser(body);
-        emailService.sendMail(new EmailDetails(body.email(), "Money Tracker - Conta criada", "Usuario cadastrado com sucesso!"));
         return ResponseEntity.ok(response);
     }
 }

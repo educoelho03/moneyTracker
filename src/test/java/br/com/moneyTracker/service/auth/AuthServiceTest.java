@@ -60,7 +60,7 @@ public class AuthServiceTest {
 
     @Test
     void loginUserWithSuccess(){
-        when(userRepository.findByEmail(authLoginRequestDTO.email())).thenReturn(Optional.ofNullable(user));
+        when(userRepository.findUserByEmail(authLoginRequestDTO.email())).thenReturn(Optional.ofNullable(user));
         when(passwordEncoder.matches(authLoginRequestDTO.password(), user.getPassword())).thenReturn(true);
         when(tokenService.generateToken(user)).thenReturn("generatedToken");
 
@@ -72,22 +72,7 @@ public class AuthServiceTest {
         assertEquals("generatedToken", response.token());
 
         verifyNoMoreInteractions(userRepository);
-
     }
-
-    @Test
-    void callExceptionPasswordsBeDifferent(){
-        when(userRepository.findByEmail(authLoginRequestDTO.email())).thenReturn(Optional.ofNullable(user));
-        when(passwordEncoder.matches(authLoginRequestDTO.password(), user.getPassword())).thenReturn(false);
-
-        final InvalidCredentialsException invalidCredentialsException = assertThrows(InvalidCredentialsException.class, () -> authService.loginUser(authLoginRequestDTO));
-        assertThat(invalidCredentialsException, notNullValue());
-        assertThat(invalidCredentialsException.getMessage(), is("Wrong Password."));
-        assertThat(invalidCredentialsException.getCause(), nullValue());
-
-        verify(userRepository, times(1)).findByEmail(authLoginRequestDTO.email());
-    }
-
 
     @Test
     void registerUserWithSuccess() {
@@ -95,7 +80,7 @@ public class AuthServiceTest {
         authRegisterRequestDTO = new AuthRegisterRequestDTO("Eduardo", "teste@gmail.com", "password");
 
         // Configura os mocks
-        when(userRepository.findByEmail(authRegisterRequestDTO.email())).thenReturn(Optional.empty()); // Usuário não existe
+        when(userRepository.findUserByEmail(authRegisterRequestDTO.email())).thenReturn(Optional.empty()); // Usuário não existe
         when(passwordEncoder.encode(authRegisterRequestDTO.password())).thenReturn("encodedPassword"); // Simula a codificação da senha
         when(tokenService.generateToken(ArgumentMatchers.any(User.class))).thenReturn("generatedToken"); // Aceita qualquer User
         when(userRepository.save(ArgumentMatchers.any(User.class))).thenAnswer(invocation -> invocation.getArgument(0)); // Retorna o User salvo
@@ -116,10 +101,23 @@ public class AuthServiceTest {
     }
 
     @Test
+    void callExceptionWhenLoginPasswordsBeDifferent(){
+        when(userRepository.findUserByEmail(authLoginRequestDTO.email())).thenReturn(Optional.ofNullable(user));
+        when(passwordEncoder.matches(authLoginRequestDTO.password(), user.getPassword())).thenReturn(false);
+
+        final InvalidCredentialsException invalidCredentialsException = assertThrows(InvalidCredentialsException.class, () -> authService.loginUser(authLoginRequestDTO));
+        assertThat(invalidCredentialsException, notNullValue());
+        assertThat(invalidCredentialsException.getMessage(), is("Wrong Password."));
+        assertThat(invalidCredentialsException.getCause(), nullValue());
+
+        verify(userRepository, times(1)).findUserByEmail(authLoginRequestDTO.email());
+    }
+
+    @Test
     void callExceptionWhenRepositoryFailed() {
         // Arrange
         authRegisterRequestDTO = new AuthRegisterRequestDTO("Eduardo", "teste@gmail.com", "password");
-        when(userRepository.findByEmail(authRegisterRequestDTO.email())).thenThrow(new RuntimeException("User not found"));
+        when(userRepository.findUserByEmail(authRegisterRequestDTO.email())).thenThrow(new RuntimeException("User not found"));
 
         // Act & Assert
         UserNotFoundException userNotFoundException = assertThrows(UserNotFoundException.class, () -> {
@@ -134,7 +132,7 @@ public class AuthServiceTest {
         assertThat(userNotFoundException.getCause().getMessage(), is("User not found")); // Verifica a mensagem da causa
 
         // Verifica as interações com os mocks
-        verify(userRepository, times(1)).findByEmail(authRegisterRequestDTO.email());
+        verify(userRepository, times(1)).findUserByEmail(authRegisterRequestDTO.email());
         verifyNoMoreInteractions(userRepository);
     }
 

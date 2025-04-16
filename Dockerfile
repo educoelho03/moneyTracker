@@ -1,5 +1,5 @@
 # Use a imagem base do OpenJDK 17
-FROM openjdk:17-jdk-alpine
+FROM openjdk:17
 
 # Define o diretório de trabalho dentro do contêiner
 WORKDIR /app
@@ -11,4 +11,4 @@ COPY target/moneyTracker-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8080
 
 # Comando para executar a aplicação
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.jar"]
+CMD ["java", "-jar", "app.jar"]

@@ -43,14 +43,14 @@ public class UserServiceTest {
 
     @Test
     void changePasswordByUserEmailWithSuccess(){
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.ofNullable(user));
+        when(userRepository.findUserByEmail(user.getEmail())).thenReturn(Optional.ofNullable(user));
         when(passwordEncoder.matches(anyString(), eq(user.getPassword()))).thenReturn(false);
         when(passwordEncoder.encode("newPassword")).thenReturn("SenhaCodificada");
 
         assertDoesNotThrow(() -> userService.updateUserPassword(user.getEmail(), "newPassword"));
         assertEquals("SenhaCodificada", user.getPassword()); // senhas sejam iguais
 
-        verify(userRepository, times(1)).findByEmail(user.getEmail()); // garante que o metodo seja chamado apenas 1 vez
+        verify(userRepository, times(1)).findUserByEmail(user.getEmail()); // garante que o metodo seja chamado apenas 1 vez
 
     }
 
@@ -79,7 +79,7 @@ public class UserServiceTest {
 
     @Test
     void notCallRepositoryIfNewPasswordIsEqualTheOldPassword(){
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(userRepository.findUserByEmail(user.getEmail())).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(anyString(), eq(user.getPassword()))).thenReturn(true);
         final SamePasswordException samePasswordException = assertThrows(SamePasswordException.class, () -> userService.updateUserPassword(user.getEmail(), "teste"));
 
@@ -87,7 +87,7 @@ public class UserServiceTest {
         assertThat(samePasswordException.getMessage(), is("Password must be different"));
         assertThat(samePasswordException.getCause(), nullValue());
 
-        verify(userRepository, times(1)).findByEmail(user.getEmail());
+        verify(userRepository, times(1)).findUserByEmail(user.getEmail());
 
     }
 
