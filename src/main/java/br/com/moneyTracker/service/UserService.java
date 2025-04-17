@@ -41,7 +41,7 @@ public class UserService implements UserServiceInterface {
 
     @Override
     public User registerUser(AuthRegisterRequestDTO authRegisterRequestDTO){
-        findUserByEmail(authRegisterRequestDTO.email());
+        // findUserByEmail(authRegisterRequestDTO.email());
         User newUser = createNewUser(authRegisterRequestDTO);
         return userRepository.save(newUser);
     }
@@ -51,7 +51,13 @@ public class UserService implements UserServiceInterface {
                 .orElseThrow(() -> new UserNotFoundException("User with this email : " + email + " not found"));
     }
 
-    private User createNewUser(AuthRegisterRequestDTO authRegisterRequestDTO) {
-        return new User(passwordEncoder.encode(authRegisterRequestDTO.password()), authRegisterRequestDTO.email(), authRegisterRequestDTO.name());
+    private User createNewUser(AuthRegisterRequestDTO dto) {
+        String name = dto.name();
+        String email = dto.email();
+        String encodedPassword = passwordEncoder.encode(dto.password());
+
+
+        return new User(name, email, encodedPassword);
     }
+
 }

@@ -11,10 +11,12 @@ import br.com.moneyTracker.infra.security.TokenService;
 import br.com.moneyTracker.interfaces.AuthServiceInterface;
 import br.com.moneyTracker.interfaces.EmailInterface;
 import br.com.moneyTracker.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class AuthService implements AuthServiceInterface {
 
     private final TokenService tokenService;
@@ -44,13 +46,14 @@ public class AuthService implements AuthServiceInterface {
     @Override
     public DataResponseDTO registerUser(AuthRegisterRequestDTO authRegisterRequestDTO) {
         try {
-            User newUser = userService.registerUser(authRegisterRequestDTO);
-            String token = tokenService.generateToken(newUser);
+            User user = userService.registerUser(authRegisterRequestDTO);
+            log.info(user.toString());
+            String token = tokenService.generateToken(user);
 
             var message = EmailInterface.Message.builder()
-                    .to(newUser.getEmail())
+                    .to(user.getEmail())
                     .subject("🎉 You’re in! Welcome to MoneyTracker.")
-                    .body("Hi " + newUser.getName() + ",\n\n" +
+                    .body("Hi " + user.getName() + ",\n\n" +
                             "Welcome to MoneyTracker – we’re glad to have you on board!\n\n" +
                             "Your account is ready, and you can now start exploring all the features we’ve prepared for you.\n\n" +
                             "Need help? We’re here anytime.\n\n" +
@@ -59,7 +62,7 @@ public class AuthService implements AuthServiceInterface {
                     ).build();
 
             emailService.sendMail(message);
-            return new DataResponseDTO(newUser.getName(), token);
+            return new DataResponseDTO(user.getName(), token);
         } catch (Exception e) {
             throw new UserNotFoundException("Error to register user.", e);
         }
