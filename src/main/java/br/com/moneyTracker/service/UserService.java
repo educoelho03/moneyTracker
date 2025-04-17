@@ -4,8 +4,8 @@ import br.com.moneyTracker.domain.entities.User;
 import br.com.moneyTracker.dto.request.AuthRegisterRequestDTO;
 import br.com.moneyTracker.exceptions.PasswordNullException;
 import br.com.moneyTracker.exceptions.SamePasswordException;
+import br.com.moneyTracker.exceptions.UserAlreadyExistsException;
 import br.com.moneyTracker.exceptions.UserNotFoundException;
-import br.com.moneyTracker.interfaces.AuthServiceInterface;
 import br.com.moneyTracker.interfaces.UserServiceInterface;
 import br.com.moneyTracker.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,8 +40,13 @@ public class UserService implements UserServiceInterface {
     }
 
     @Override
-    public User registerUser(AuthRegisterRequestDTO authRegisterRequestDTO){
-        // findUserByEmail(authRegisterRequestDTO.email());
+    public User registerUser(AuthRegisterRequestDTO authRegisterRequestDTO) {
+        // Verifica se o email já existe
+        if (userRepository.findUserByEmail(authRegisterRequestDTO.email()).isPresent()) {
+            throw new UserAlreadyExistsException("User with this email: " + authRegisterRequestDTO.email() + " already exists");
+        }
+
+        // Se não existir, cria o novo usuário
         User newUser = createNewUser(authRegisterRequestDTO);
         return userRepository.save(newUser);
     }

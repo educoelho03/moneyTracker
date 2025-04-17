@@ -1,10 +1,8 @@
 package br.com.moneyTracker.controller.auth;
 
-import br.com.moneyTracker.dto.EmailDetails;
 import br.com.moneyTracker.dto.request.AuthLoginRequestDTO;
 import br.com.moneyTracker.dto.request.AuthRegisterRequestDTO;
 import br.com.moneyTracker.dto.response.DataResponseDTO;
-import br.com.moneyTracker.service.EmailService;
 import br.com.moneyTracker.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,11 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
-    private final EmailService emailService;
 
-    public AuthController(AuthService authService, EmailService emailService) {
+    public AuthController(AuthService authService) {
         this.authService = authService;
-        this.emailService = emailService;
     }
 
 
